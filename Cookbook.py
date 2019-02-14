@@ -56,12 +56,23 @@ async def on_message(message):
         mycursor.execute("SELECT * FROM recipes")
        
         myresult = mycursor.fetchall()
-        index = randint(1, len(myresult))
-        await client.send_message(message.channel, myresult[index])
+        index = randint(0, len(myresult)-1)
+        await client.send_message(message.channel, formatRec.formatRec(myresult[index]))
 
     # command to list all commands
     if message.content.startswith('!help'):
-        await client.send_message(message.channel, "Commands: !getAll, !random, !add \n !add syntax: |name|protein source|ingredients|instructions")
+        await client.send_message(message.channel, "Commands: !getAll, !random, !add, !protein \n !add syntax: |name|protein source|ingredients|instructions \n !protein syntax: |protein name")
+
+    # command to query by protein source    
+    if message.content.startswith('!protein'):
+        msg = message.content.split("|")
+        mycursor = mydb.cursor()
+        val = ("SELECT * FROM recipes WHERE protein_source = %s")
+        param = (msg[1],)
+        mycursor.execute(val, param)
+        myresult = mycursor.fetchall()
+        for x in myresult:
+            await client.send_message(message.channel, formatRec.formatRec(x))    
 
 @client.event
 async def on_ready():
