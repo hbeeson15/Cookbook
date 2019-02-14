@@ -4,6 +4,7 @@ import formatRec
 from dotenv import load_dotenv
 load_dotenv()
 import os
+from random import randint
 
 # connect to SQL
 mydb = mysql.connector.connect(
@@ -47,7 +48,20 @@ async def on_message(message):
         mycursor.execute(val, commands)
 
         mydb.commit()
-        await client.send_message(message.channel, mycursor.rowcount)        
+        await client.send_message(message.channel, mycursor.rowcount)
+
+    # command to get a random recipe
+    if message.content.startswith('!random'):
+        mycursor = mydb.cursor()
+        mycursor.execute("SELECT * FROM recipes")
+       
+        myresult = mycursor.fetchall()
+        index = randint(1, len(myresult))
+        await client.send_message(message.channel, myresult[index])
+
+    # command to list all commands
+    if message.content.startswith('!help'):
+        await client.send_message(message.channel, "Commands: !getAll, !random, !add \n !add syntax: |name|protein source|ingredients|instructions")
 
 @client.event
 async def on_ready():
