@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 
-
+# connect to SQL
 mydb = mysql.connector.connect(
     host = "localhost",
     user = "holly",
@@ -13,10 +13,12 @@ mydb = mysql.connector.connect(
     database = "Cookbook"
 )
 
+# Discord token
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 client = discord.Client()
 
+# tell bot how to respond
 @client.event
 async def on_message(message):
     # we do not want the bot to reply to itself
@@ -27,13 +29,15 @@ async def on_message(message):
         msg = 'Hello {0.author.mention}'.format(message)
         await client.send_message(message.channel, msg)
 
-    if message.content.startswith('get all'):
+    # command to display all recipes
+    if message.content.startswith('!getAll'):
         mycursor = mydb.cursor()
         mycursor.execute("SELECT * FROM recipes")
         myresult = mycursor.fetchall()
         for x in myresult:
             await client.send_message(message.channel, formatRec.formatRec(x))
     
+    # command to add new recipe to database
     if message.content.startswith('!add'):
         msg = message.content.split("|")
         print (msg)
