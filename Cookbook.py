@@ -61,19 +61,32 @@ async def on_message(message):
 
     # command to list all commands
     if message.content.startswith('!help'):
-        await client.send_message(message.channel, "Commands: !getAll, !random, !add, !protein \n !add syntax: |name|protein source|ingredients|instructions \n !protein syntax: |protein name")
+        await client.send_message(message.channel, "Commands: !getAll, !random, !add, !protein, !name" + 
+        "\n !add syntax: |name|protein source|ingredients|instructions \n !protein syntax: |protein name (partial or whole)" + 
+            "\n !name syntax: |name (partial or whole)")
 
     # command to query by protein source    
     if message.content.startswith('!protein'):
         msg = message.content.split("|")
         mycursor = mydb.cursor()
-        val = ("SELECT * FROM recipes WHERE protein_source = %s")
-        param = (msg[1],)
+        val = ("SELECT * FROM recipes WHERE protein_source LIKE %s")
+        param = ('%'+msg[1]+'%',)
         mycursor.execute(val, param)
         myresult = mycursor.fetchall()
         for x in myresult:
             await client.send_message(message.channel, formatRec.formatRec(x))    
 
+    # command to query by name
+    if message.content.startswith('!name'):
+        msg = message.content.split("|")
+        mycursor = mydb.cursor()
+        val = ("SELECT * FROM recipes WHERE r_name LIKE %s")
+        param = ('%'+msg[1]+'%',)
+        mycursor.execute(val, param)
+        myresult = mycursor.fetchall()
+        for x in myresult:
+            await client.send_message(message.channel, formatRec.formatRec(x))
+        
 @client.event
 async def on_ready():
     print('Logged in as')
