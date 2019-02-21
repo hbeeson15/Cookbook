@@ -48,7 +48,7 @@ async def on_message(message):
         mycursor.execute(val, commands)
 
         mydb.commit()
-        await client.send_message(message.channel, mycursor.rowcount)
+        await client.send_message(message.channel, 'Yummy!')
 
     # command to get a random recipe
     if message.content.startswith('!random'):
